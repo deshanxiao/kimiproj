@@ -123,12 +123,15 @@ Gateway实例处理。
 当本地水位不够时，该请求将转发到云端K8S的Gateway。后面的步骤应该是一样的。这里本地Gateway需要记录哪些sessionId走了远端执行，后面遇到远端执行的实例直接转发即可。
 
 
+# 搭建⼀个⽀持部署 Vibe Coding 应⽤的平台。
 
+## 需求分析
 
+用户可以在代码编辑器里面编写代码，并且可以借助主流的AI模型生成代码。当点击运行时，会生成一个exec/python或者 exec/nodejs的请求，并展示运行结果。如果有图像也会展示图像。
 
+## 总体架构
 
-
-
+<img width="1022" height="676" alt="image" src="https://github.com/user-attachments/assets/ec9d2b4e-1e79-4c6c-8589-f5c1504b95ed" />
 
 
 
