@@ -1,0 +1,11 @@
+fastapi==0.103.2
+uvicorn==0.23.2
+matplotlib==3.8.0
+pillow==10.0.1
+psutil==7.0.0
+python-multipart==0.0.20
+restrictedpython==8.0
+py-spy==0.4.0
+httpx==0.24.1
+kubernetes==33.1.0
+cffi==1.17.1

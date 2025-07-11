@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sandbox-sa
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sandbox-read-nodes
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "pods"]
+  verbs: ["get", "list", "watch", "create"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: sandbox-read-nodes-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: sandbox-read-nodes
+subjects:
+- kind: ServiceAccount
+  name: sandbox-sa
+  namespace: default
+---
+# 2. Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sandbox-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sandbox
+  template:
+    metadata:
+      labels:
+        app: sandbox
+    spec:
+      serviceAccountName: sandbox-sa   # ✅ 添加此行
+      imagePullSecrets:
+        - name: acr-secret
+      containers:
+      - name: sandbox
+        image: kimitest2.azurecr.io/sandbox-image:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        - containerPort: 5858
+        resources:
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+          requests:
+            cpu: "0.5"
+            memory: "256Mi"
+---
+# 3. 内部服务
+apiVersion: v1
+kind: Service
+metadata:
+  name: sandbox
+  namespace: default
+  annotations:
+    service.alpha.kubernetes.io/internal-service: "true"
+spec:
+  type: ClusterIP
+  selector:
+    app: sandbox
+  ports:
+  - name: internal-port
+    protocol: TCP
+    port: 5858
+    targetPort: 5858
+---
+# 4. 外部访问服务（用于 Ingress）
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway
+  namespace: default
+spec:
+  selector:
+    app: sandbox
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+---
+# 5. Ingress 路由规则
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sandbox-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/upstream-hash-by: "$1"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      - path: /([^/]+)/(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: gateway
+            port:
+              number: 80

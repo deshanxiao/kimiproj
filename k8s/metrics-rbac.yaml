@@ -1,0 +1,21 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: metrics-access
+rules:
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["nodes", "pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: default-metrics-access
+subjects:
+- kind: ServiceAccount
+  name: default  # 使用 default ServiceAccount
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: metrics-access
+  apiGroup: rbac.authorization.k8s.io

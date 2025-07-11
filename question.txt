@@ -1,0 +1,12 @@
+1. 使⽤ Docker 搭建⼀个 Sandbox 镜像，对外提供⽂件管理、进程管理、代码执⾏等功能
+a. 如何进⾏进程管理？
+i. 如何避免读取 stdin 导致进程⽆响应
+b. 如何设计并实现⼀个 Python Interpreter
+i. 如何⽀持 matplotlib 的 imshow 以 base64 返给调⽤⽅
+c. 如何设计并实现⼀个 NodeJS Interpreter
+d. 安全容器是做什么的？采⽤什么⽅案？
+
+安全容器通过强化容器与宿主系统的隔离，防止容器内进程对宿主系统、其他容器或网络造成威胁。主要方案包括使用 gVisor（用户空间内核）、Kata Containers（轻量虚拟机）、Firecracker（微虚拟机）、seccomp（系统调用过滤）等技术。这些方案通过虚拟化、限制系统调用、强化权限管理等手段，提供比传统容器更强的安全性。
+
+2. 搭建⼀个⽀持混合云的 Sandbox 调度系统。
+3. 搭建⼀个⽀持部署 Vibe Coding 应⽤的平台。
